@@ -12,6 +12,8 @@ class GeneticAlgo():
         self.generations = generations
         self.population = self.random_population()
         self.data = pd.DataFrame(prices, columns= ["Close"])
+
+        self.best_chromosome = [0,None]
         
         
 
@@ -22,8 +24,8 @@ class GeneticAlgo():
     
     def fitness_level(self, chromosome:list[int])-> float:
         # Convert the chromosome to two integers
-        sma = int(''.join(map(str, chromosome[:6])), 2) + 1  # 1 <= length of window for shorter moving average <= 2^(n/2) - 1 
-        lma = int(''.join(map(str, chromosome[6:])), 2) + sma+1 # sma < length of window for longer moving average <= sma + (2^(n/2) - 1)
+        sma = int(''.join(map(str, chromosome[:int(self.chromosome_size/2)])), 2) + 1  # 1 <= length of window for shorter moving average <= 2^(n/2) - 1 
+        lma = int(''.join(map(str, chromosome[int(self.chromosome_size/2):])), 2) + sma # sma < length of window for longer moving average <= sma + (2^(n/2) - 1)
 
         self.data["SMA"] = self.data["Close"].rolling(window= sma).mean()
         self.data["LMA"] = self.data["Close"].rolling(window= lma).mean()
@@ -34,12 +36,22 @@ class GeneticAlgo():
         • Go short (= -1) when the shorter SMA is below the longer SMA.
         For a long only strategy one would use +1 for a long position and 0 for a neutral position.
         '''
-        self.data["Position"] = np.where(self.data['SMA'] > self.data['LMA'], 1, -1)
+        self.data["Signal"] = 0
+        self.data["Signal"] = np.where(self.data['SMA'] > self.data['LMA'], 1, 0)
+        self.data['Position'] = self.data['Signal'].diff()
 
-        self.data['Change'] = np.log(self.data["Close"] / self.data["Close"].shift(1))
-        self.data['Return'] = self.data['Position'].shift(1)*self.data['Change']
-        result  = self.data['Return'].sum()
-        return result
+
+        self.data['Returns'] = self.data['Close'].pct_change()
+        self.data['StrategyReturns'] = self.data['Returns'] * self.data['Position'].shift(1)
+
+        self.data['CumulativeStrategyReturns'] = (1 + self.data['StrategyReturns']).cumprod()
+
+        # self.data['Change'] = np.log(self.data["Close"] / self.data["Close"].shift(1))
+        # self.data['Return'] = self.data['Position'].shift(1)*self.data['Change']
+        # result  = np.exp(self.data['Return'].sum())
+
+        
+        return self.data['CumulativeStrategyReturns'].iloc[-1]
     
     
     def selection(self) -> list[list[int]]:
@@ -88,7 +100,14 @@ class GeneticAlgo():
 
             
             self.population = next_generation
-            best_fitness = max([self.fitness_level(chrom) for chrom in self.population])
+
+            best_fitness = 0
+            for chrom in self.population:
+                best_fitness = max(self.fitness_level(chrom), best_fitness) 
+                if best_fitness > self.best_chromosome[0]:
+                    self.best_chromosome[0] = best_fitness
+                    self.best_chromosome[1] = chrom
+
             print(f'Generation {generation+1} | Best Fitness: {best_fitness:.4f}')
 
 raw = raw = pd.read_csv('./tr_eikon_eod_data.csv',
@@ -97,18 +116,21 @@ symbol = 'AAPL.O'
 data = pd.DataFrame(raw[symbol].dropna())
 data.rename(columns={'AAPL.O':'Close'}, inplace=True)
 
-print(data)
-ga = GeneticAlgo(population_size=100, chromosome_size=12, mutation_rate=0.01, crossover_rate=0.8, generations=100, prices=data)
+# print(data)
+ga = GeneticAlgo(population_size=100, chromosome_size=10, mutation_rate=0.01, crossover_rate=0.8, generations=10, prices=data)
+# print(ga.data)
+# print(ga.fitness_level([1]*3+[0]*3+[1]*3+[0]*3))
+# ga.evolve()
+        
+        
+
+# Create an instance of the GeneticAlgorithm class
+# ga = GeneticAlgo(population_size=100, chromosome_length=12, mutation_rate=0.01, crossover_rate=0.8, generations=100)
+
+# Run the genetic algorithm to optimize the trading strategy
+ga.evolve()
 print(ga.data)
-print(ga.fitness_level([1]*3+[0]*3+[1]*3+[0]*3))
-# ga.evolve()
-        
-        
-
-# # Create an instance of the GeneticAlgorithm class
-# ga = GeneticAlgor(population_size=100, chromosome_length=10, mutation_rate=0.01, crossover_rate=0.8, generations=100)
-
-# # Run the genetic algorithm to optimize the trading strategy
-# ga.evolve()
-
+print(ga.data.head())
+print(ga.data.tail())
+print(ga.best_chromosome)
         
