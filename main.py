@@ -9,7 +9,7 @@ class GeneticAlgo():
 
     def __init__(self, population_size: int, chromosome_size: int, mutation_rate: float, crossover_rate: float,generations:int, prices: np.ndarray ):
         self.population_size = population_size  # No. of chromosome in a generation
-        self.chromosome_size = 14               # No. bits for representing the moving averages of both the shorter and longer window
+        self.chromosome_size = chromosome_size  # No. bits for representing the moving averages of both the shorter and longer window
         self.mutation_rate = mutation_rate      # How likely a bit in a chromosome would be mutated
         self.crossover_rate  = crossover_rate   # How likely we would crossover two parents to generate a pair of two 
         self.generations = generations          # No. of iteration to generate new population
@@ -222,10 +222,10 @@ class GeneticAlgo():
                     best_fitness = score
                     best_chrom = chrom
                     
-                    # Best Chrom across all generations 
-                    if best_fitness > self.best_chromosome[0]:
-                        self.best_chromosome[0] = best_fitness
-                        self.best_chromosome[1] = chrom
+            # Best Chrom across all generations 
+            if best_fitness > self.best_chromosome[0]:
+                self.best_chromosome[0] = best_fitness
+                self.best_chromosome[1] = best_chrom
 
             sma, lma  = self.chrom_to_int(best_chrom)
             print(f'Generation {generation+1} | Best Fitness: {best_fitness:.4f} | S/L Window: {sma, lma}' )
@@ -299,7 +299,7 @@ data = pd.DataFrame(raw[symbol].dropna())
 data.rename(columns={symbol:'Close'}, inplace=True)
 
 
-ga = GeneticAlgo(population_size=5000, chromosome_size=14, mutation_rate=0.3, crossover_rate=0.8, generations=50, prices=data)
+ga = GeneticAlgo(population_size=2500, chromosome_size=14, mutation_rate=0.4, crossover_rate=0.8, generations=20, prices=data)
 ga.evolve()
 print("### The Chrom with the highest fitness score ###")
 sma, lma = ga.chrom_to_int(ga.best_chromosome[1])
