@@ -43,10 +43,26 @@ By iteratively applying these steps, the Genetic Algorithm evolves the populatio
 ### How to run this code
 - `python3 main.py`
 
+### Assumption
+- Short-term & Long-term Window  
+For short term and long term SMA, 50-day and 200-day are generally adopted.  
+In this project, each chromosome contains 14-bit binary number. The first 6-bit is used for short-term SMA. The maximum value of a 6-bit unsigned binary number is `2^6 -1 = 63`, which is slightly higher than 50.
+Similarly, `2^(14-6) -1 = 2^(8) - 1 =  255`, so 8-bit is assigned for long term sma.  
+For example, for a chromosome `[1,0,0,0,0,1,0,0,0,1,1,0,1,1]`.  
+The first 6-bit is `[1,0,0,0,0,1]`, representing `32+1+(1) = 34`  
+The last 8-bit is `[0,0,0,1,1,0,1,1]`, representing `16+8+2+1+(1) = 28`  
+*** Every integer represented by a  will be incremented by 1, to avoid zero value
+
+
+
+
+- Fitness Score
+  For meauring the fitness level of a chromosome, the culmulative return of the two window size that the chromosome contains will be used.
+
 ### Result
 <img width="1028" alt="Output_1" src="https://github.com/user-attachments/assets/7fbc5f3f-e616-4040-902c-2198d7df23d9">
 <img width="1028" alt="Output_2" src="https://github.com/user-attachments/assets/cd0d95fa-dda8-4ef5-8c87-a1ef3bb4ae1a">
-![Sample](https://github.com/user-attachments/assets/1fd874dc-d55f-4e57-a49c-3fac0b26eae4)
 
+![Sample](https://github.com/user-attachments/assets/c13566db-802a-4f92-ab8f-026761473c71)
 
 
