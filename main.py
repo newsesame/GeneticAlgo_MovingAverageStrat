@@ -292,21 +292,27 @@ class GeneticAlgo():
         plt.legend()
         plt.show()
 
+
+# Import Data
 raw = raw = pd.read_csv('./tr_eikon_eod_data.csv',
                               index_col=0, parse_dates=True)
 symbol = 'AAPL.O'
 data = pd.DataFrame(raw[symbol].dropna())
 data.rename(columns={symbol:'Close'}, inplace=True)
 
-
+# Run the genetic algorithm
 ga = GeneticAlgo(population_size=2500, chromosome_size=14, mutation_rate=0.4, crossover_rate=0.8, generations=20, prices=data)
 ga.evolve()
-print("### The Chrom with the highest fitness score ###")
+
+## Print the information of the best chromosome
+print("### The Chrom with the highest fitness level ###")
 sma, lma = ga.chrom_to_int(ga.best_chromosome[1])
 print("Chrom: ", str(ga.best_chromosome[1]))
 print("Short-term Window: " + str(sma)+ " | " +" Long-term Window: " + str(lma) )
 print("Fitness Score: ", ga.fitness_level(ga.best_chromosome[1]))
 print()
+
+## Print the position parameterized by the best chromosome
 print("### Table of positions ###")
 ga.position(ga.best_chromosome[1])
 ga.plot_chromo(ga.best_chromosome[1])
