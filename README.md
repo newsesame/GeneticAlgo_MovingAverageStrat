@@ -30,3 +30,23 @@ Genetic Algorithms (GAs) are optimization techniques inspired by the principles 
 - **Genetic Diversity**: The variety of different solutions in the population, crucial for avoiding premature convergence.
 
 By iteratively applying these steps, the Genetic Algorithm evolves the population towards optimal or near-optimal solutions.
+
+
+## About this project
+
+### Project Structure
+
+- `tr_eikon_eod_data.csv`: data
+- `SMA.ipynb` : Implemenet the SMA Crossover Strategy
+- `main.py` : Optimize the short-term and long-term window for SMA Crossover Strategy by Genetic Algorithm
+  
+### How to run this code
+- `python3 main.py`
+
+### Result
+<img width="1028" alt="Output_1" src="https://github.com/user-attachments/assets/7fbc5f3f-e616-4040-902c-2198d7df23d9">
+<img width="1028" alt="Output_2" src="https://github.com/user-attachments/assets/cd0d95fa-dda8-4ef5-8c87-a1ef3bb4ae1a">
+![Sample](https://github.com/user-attachments/assets/1fd874dc-d55f-4e57-a49c-3fac0b26eae4)
+
+
+
